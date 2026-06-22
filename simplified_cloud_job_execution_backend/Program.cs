@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using simplified_cloud_job_execution_backend;
+using simplified_cloud_job_execution_backend.Infrastructure.Database;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,12 @@ Dependencies.Inject(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -19,8 +27,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapControllers();
-app.UseHttpsRedirection();
 app.UseExceptionHandler();
+app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();

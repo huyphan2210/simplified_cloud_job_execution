@@ -11,6 +11,9 @@ using simplified_cloud_job_execution_backend.Repositories.JobRepository;
 using simplified_cloud_job_execution_backend.Services.BillingServices;
 using simplified_cloud_job_execution_backend.Services.JobServices;
 using simplified_cloud_job_execution_backend.Exceptions;
+using System.Text.Json.Serialization;
+using simplified_cloud_job_execution_backend.Services.ProjectServices;
+using simplified_cloud_job_execution_backend.Repositories.ProjectRepository;
 
 namespace simplified_cloud_job_execution_backend;
 
@@ -45,7 +48,10 @@ public static class Dependencies
 
   private static void AddEndpoints(this IServiceCollection services)
   {
-    services.AddControllers();
+    services.AddControllers().AddJsonOptions(options =>
+    {
+      options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
@@ -61,11 +67,14 @@ public static class Dependencies
   {
     services.AddScoped<IJobServices, JobServices>();
     services.AddScoped<IJobRepository, JobRepository>();
-    services.AddScoped<IJobQueue, SqsJobQueue>();
+
+    services.AddScoped<IProjectServices, ProjectServices>();
+    services.AddScoped<IProjectRepository, ProjectRepository>();
 
     services.AddScoped<ISsmCommandService, SsmCommandService>();
     services.AddScoped<IJobExecutor, Ec2JobExecutor>();
     services.AddScoped<IS3FileService, S3FileService>();
+    services.AddScoped<IJobQueue, SqsJobQueue>();
 
     services.AddHostedService<JobExecutionWorker>();
 

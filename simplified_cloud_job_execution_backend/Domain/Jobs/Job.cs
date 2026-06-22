@@ -1,10 +1,13 @@
+using simplified_cloud_job_execution_backend.Domain.Projects;
+
 namespace simplified_cloud_job_execution_backend.Domain.Jobs;
 
 public class Job
 {
   public Guid Id { get; set; }
   public required string JobName { get; set; }
-  public required string ProjectId { get; set; }
+  public required Guid ProjectId { get; set; }
+  public Project? Project { get; set; }
   public ComputeType ComputeType { get; set; }
   public JobStatus Status { get; set; }
   public required string InputFileName { get; set; }

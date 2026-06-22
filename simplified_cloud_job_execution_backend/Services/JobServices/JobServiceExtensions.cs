@@ -11,13 +11,32 @@ public static class JobServiceExtensions
     {
       JobId = job.Id,
       JobName = job.JobName,
-      ProjectId = job.ProjectId,
+      Project = job.Project,
       ComputeType = job.ComputeType,
       Status = job.Status,
       ExecutionDurationSeconds = job.ExecutionDurationSeconds,
       CreditCost = job.CreditCost,
       InputFileReference = job.InputFileReference,
       OutputFileReference = job.OutputFileReference,
+      CreatedAt = job.CreatedAt,
+      UpdatedAt = job.UpdatedAt
+    };
+  }
+
+  public static GetJobStatusResponse ToGetJobStatusResponse(this Job job)
+  {
+    return new GetJobStatusResponse
+    {
+      JobId = job.Id,
+      JobName = job.JobName,
+      Project = job.Project,
+      ComputeType = job.ComputeType,
+      Status = job.Status,
+      InputFileName = job.InputFileName,
+      InputFileReference = job.InputFileReference,
+      OutputFileReference = job.OutputFileReference,
+      ExecutionDurationSeconds = job.ExecutionDurationSeconds,
+      CreditCost = job.CreditCost,
       CreatedAt = job.CreatedAt,
       UpdatedAt = job.UpdatedAt
     };
