@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src/backend
 COPY simplified_cloud_job_execution_backend/*.csproj ./
 RUN dotnet restore
-COPY . ./
+COPY simplified_cloud_job_execution_backend ./
 RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
