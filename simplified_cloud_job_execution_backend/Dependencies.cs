@@ -47,7 +47,7 @@ public static class Dependencies
       );
 
       connectionStringBuilder.Password = iamAuthToken;
-      connectionStringBuilder.SslMode = SslMode.Prefer;
+      connectionStringBuilder.SslMode = SslMode.Require;
       connectionStringBuilder.Timeout = 60;
     }
 
