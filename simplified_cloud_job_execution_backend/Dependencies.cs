@@ -36,11 +36,9 @@ public static class Dependencies
     var connectionStringBuilder = new NpgsqlConnectionStringBuilder(defaultConnectionString);
     if (isProduction)
     {
-      string currentRegion = Environment.GetEnvironmentVariable("AWS_REGION") ?? "ap-southeast-1";
-      Amazon.RegionEndpoint region = Amazon.RegionEndpoint.GetBySystemName(currentRegion);
 
       string iamAuthToken = RDSAuthTokenGenerator.GenerateAuthToken(
-          region,
+          Amazon.RegionEndpoint.APSoutheast1,
           connectionStringBuilder.Host,
           connectionStringBuilder.Port,
           connectionStringBuilder.Username
