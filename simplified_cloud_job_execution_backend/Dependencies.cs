@@ -36,16 +36,19 @@ public static class Dependencies
     var connectionStringBuilder = new NpgsqlConnectionStringBuilder(defaultConnectionString);
     if (isProduction)
     {
-      // Generate IAM auth token for RDS
+      string currentRegion = Environment.GetEnvironmentVariable("AWS_REGION") ?? "ap-southeast-1";
+      Amazon.RegionEndpoint region = Amazon.RegionEndpoint.GetBySystemName(currentRegion);
+
       string iamAuthToken = RDSAuthTokenGenerator.GenerateAuthToken(
-          Amazon.RegionEndpoint.APSoutheast1,
+          region,
           connectionStringBuilder.Host,
           connectionStringBuilder.Port,
           connectionStringBuilder.Username
       );
 
       connectionStringBuilder.Password = iamAuthToken;
-      connectionStringBuilder.SslMode = SslMode.Require;
+      connectionStringBuilder.SslMode = SslMode.Prefer;
+      connectionStringBuilder.Timeout = 60;
     }
 
     services.AddDbContext<AppDbContext>(options =>
