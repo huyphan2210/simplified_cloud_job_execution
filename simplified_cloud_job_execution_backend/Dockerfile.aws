@@ -1,0 +1,21 @@
+FROM node:24-alpine AS frontend-build
+WORKDIR /src/frontend
+COPY simplified_cloud_job_execution_frontend/package*.json ./
+RUN npm install
+COPY simplified_cloud_job_execution_frontend .
+RUN npm run build
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src/backend
+COPY simplified_cloud_job_execution_backend/*.csproj ./
+RUN dotnet restore
+COPY . ./
+RUN dotnet publish -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish/ .
+COPY --from=frontend-build /src/frontend/dist ./wwwroot
+ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "simplified_cloud_job_execution_backend.dll"]

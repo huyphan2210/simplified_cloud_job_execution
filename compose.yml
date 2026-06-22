@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:17
+    container_name: job-execution-db
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+      POSTGRES_DB: jobsystem
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./simplified_cloud_job_execution_backend
+      dockerfile: Dockerfile
+    container_name: job-execution-backend
+    depends_on:
+      - db
+    env_file:
+      - ./simplified_cloud_job_execution_backend/.env
+    ports:
+      - "5000:5000"
+
+  nginx:
+    build:
+      context: ./simplified_cloud_job_execution_frontend
+      dockerfile: Dockerfile.nginx
+    container_name: job-execution-nginx
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:
