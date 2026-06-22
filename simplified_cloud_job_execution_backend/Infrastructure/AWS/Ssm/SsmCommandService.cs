@@ -40,11 +40,20 @@ public class SsmCommandService(
       GetCommandInvocationResponse? invocation = null;
       while (!cancellationToken.IsCancellationRequested)
       {
-        invocation = await _ssmClient.GetCommandInvocationAsync(new GetCommandInvocationRequest
+        try
         {
-          CommandId = commandId,
-          InstanceId = instanceId
-        }, cancellationToken);
+          invocation = await _ssmClient.GetCommandInvocationAsync(new GetCommandInvocationRequest
+          {
+            CommandId = commandId,
+            InstanceId = instanceId
+          }, cancellationToken);
+        }
+        catch (InvocationDoesNotExistException)
+        {
+          _logger.LogDebug("SSM invocation not yet available for command {CommandId} on instance {InstanceId}, retrying...", commandId, instanceId);
+          await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+          continue;
+        }
 
         if (invocation.Status == CommandInvocationStatus.Success 
             || invocation.Status == CommandInvocationStatus.Failed 
