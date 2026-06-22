@@ -14,24 +14,43 @@ using simplified_cloud_job_execution_backend.Exceptions;
 using System.Text.Json.Serialization;
 using simplified_cloud_job_execution_backend.Services.ProjectServices;
 using simplified_cloud_job_execution_backend.Repositories.ProjectRepository;
+using Npgsql;
+using Amazon.RDS.Util;
 
 namespace simplified_cloud_job_execution_backend;
 
 public static class Dependencies
 {
-  public static void Inject(this IServiceCollection services, IConfiguration configuration)
+  public static void Inject(this IServiceCollection services, IConfiguration configuration, bool isProduction = false)
   {
     AddEndpoints(services);
-    AddInfrastructure(services, configuration);
+    AddInfrastructure(services, configuration, isProduction);
     AddCustomService(services);
     AddGlobalExceptionHandler(services);
   }
 
-  private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+  private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration, bool isProduction)
   {
+    string defaultConnectionString = configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("DefaultConnection connection string not found.");
+    var connectionStringBuilder = new NpgsqlConnectionStringBuilder(defaultConnectionString);
+    if (isProduction)
+    {
+      // Generate IAM auth token for RDS
+      string iamAuthToken = RDSAuthTokenGenerator.GenerateAuthToken(
+          Amazon.RegionEndpoint.APSoutheast1,
+          connectionStringBuilder.Host,
+          connectionStringBuilder.Port,
+          connectionStringBuilder.Username
+      );
+
+      connectionStringBuilder.Password = iamAuthToken;
+      connectionStringBuilder.SslMode = SslMode.Require;
+    }
+
     services.AddDbContext<AppDbContext>(options =>
     {
-      options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+      options.UseNpgsql(connectionStringBuilder.ConnectionString);
       options.UseSnakeCaseNamingConvention();
     });
 

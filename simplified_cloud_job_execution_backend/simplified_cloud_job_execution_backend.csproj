@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.4.10" />
+    <PackageReference Include="AWSSDK.RDS" Version="4.0.21.7" />
     <PackageReference Include="AWSSDK.S3" Version="4.0.25.2" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="4.0.8.7" />
     <PackageReference Include="AWSSDK.SQS" Version="4.0.3.7" />

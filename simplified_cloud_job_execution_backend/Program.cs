@@ -10,7 +10,7 @@ builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
-Dependencies.Inject(builder.Services, builder.Configuration);
+Dependencies.Inject(builder.Services, builder.Configuration, builder.Environment.IsProduction());
 
 var app = builder.Build();
 
