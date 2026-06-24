@@ -33,25 +33,10 @@ public static class Dependencies
   {
     string defaultConnectionString = configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("DefaultConnection connection string not found.");
-    var connectionStringBuilder = new NpgsqlConnectionStringBuilder(defaultConnectionString);
-    if (isProduction)
-    {
-
-      string iamAuthToken = RDSAuthTokenGenerator.GenerateAuthToken(
-          Amazon.RegionEndpoint.APSoutheast1,
-          connectionStringBuilder.Host,
-          connectionStringBuilder.Port,
-          connectionStringBuilder.Username
-      );
-
-      connectionStringBuilder.Password = iamAuthToken;
-      connectionStringBuilder.SslMode = SslMode.Require;
-      connectionStringBuilder.Timeout = 60;
-    }
-
+    
     services.AddDbContext<AppDbContext>(options =>
     {
-      options.UseNpgsql(connectionStringBuilder.ConnectionString);
+      options.UseNpgsql(defaultConnectionString);
       options.UseSnakeCaseNamingConvention();
     });
 
