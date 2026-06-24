@@ -16,6 +16,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish/ .
 COPY --from=frontend-build /src/frontend/dist ./wwwroot
+COPY global-bundle.pem /app/global-bundle.pem
 ENV ASPNETCORE_URLS=http://+:5000
 EXPOSE 5000
 ENTRYPOINT ["dotnet", "simplified_cloud_job_execution_backend.dll"]
